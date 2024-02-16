@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: falco
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: https://github.com/kyppling/homelab
+        targetRevision: HEAD
+        ref: config
+    - repoURL: https://falcosecurity.github.io/charts
+        chart: falco
+        targetRevision: 4.2.2
+        helm:
+          releaseName: falco
+          valueFiles: 
+            - $config/argocd/configs/falco/values.yaml
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: falco
+syncPolicy:
+  automated:
+    prune: true
+    selfHeal: true
